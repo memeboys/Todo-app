@@ -18,7 +18,7 @@ function createTask({ description }) {
 
 const TodoApp = () => {
   const [tasks, setTasks] = useState(() => [
-    createTask({ description: 'A' }),
+    createTask({ description: 'H' }),
     createTask({ description: 'B' }),
     createTask({ description: 'C' }),
   ]);
