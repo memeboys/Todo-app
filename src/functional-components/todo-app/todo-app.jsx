@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Footer from '../footer/footer';
 import Header from '../header/header';
 import NewTaskForm from '../new-task-form/new-task-form';
@@ -7,23 +7,36 @@ import TaskList from '../task-list/task-list';
 import TasksFilter, { TaskFilterValue } from '../tasks-filter/tasks-filter';
 import './todo-app.css';
 
-function createTask({ description }) {
+function createTask({ description, minutes = 240000, seconds = 20000 }) {
   return {
     id: nanoid(),
     description,
     isCompleted: false,
     createDate: new Date(),
+    timerStatus: false,
+    timer: minutes + seconds,
   };
 }
 
 const TodoApp = () => {
   const [tasks, setTasks] = useState(() => [
-    createTask({ description: 'H' }),
-    createTask({ description: 'B' }),
-    createTask({ description: 'C' }),
+    createTask({ description: 'Т' }),
+    createTask({ description: 'У' }),
+    createTask({ description: 'Д' }),
+    createTask({ description: 'У' }),
   ]);
-
   const [filterValue, setFilterValueChange] = useState(TaskFilterValue.ALL);
+
+  useEffect(() => {
+    let prevTime = Date.now();
+    const intervalId = setInterval(() => {
+      const currentTime = Date.now();
+      const delta = currentTime - prevTime;
+      prevTime = currentTime;
+      timerChange(delta);
+    }, 1000);
+    return () => clearInterval(intervalId);
+  }, []);
 
   const getActiveCount = () => {
     return tasks.reduce((result, task) => {
@@ -67,8 +80,10 @@ const TodoApp = () => {
     setTasks(newTasks);
   };
 
-  const handleNewTask = (description) => {
-    const newTask = createTask({ description });
+  const handleNewTask = (description, min, sec) => {
+    let minutes = min * 60 * 1000;
+    let seconds = sec * 1000;
+    const newTask = createTask({ description, minutes, seconds });
     const newTasks = [...tasks, newTask];
     setTasks(newTasks);
   };
@@ -84,6 +99,39 @@ const TodoApp = () => {
     setTasks(newTasks);
   };
 
+  const timerChange = (delta) => {
+    setTasks((tasks) => {
+      return tasks.map((task) => {
+        if (!task.timerStatus) return task;
+        return {
+          ...task,
+          timer: Math.max(0, task.timer - delta),
+        };
+      });
+    });
+  };
+
+  const handleTimerStart = (taskChange) => {
+    const newTasks = tasks.map((task) => {
+      if (task !== taskChange) return task;
+      return {
+        ...task,
+        timerStatus: true,
+      };
+    });
+    setTasks(newTasks);
+  };
+  const handleTimerStop = (taskChange) => {
+    const newTasks = tasks.map((task) => {
+      if (task !== taskChange) return task;
+      return {
+        ...task,
+        timerStatus: false,
+      };
+    });
+    setTasks(newTasks);
+  };
+
   return (
     <section className="todoapp">
       <Header>
@@ -91,6 +139,8 @@ const TodoApp = () => {
       </Header>
       <section className="main">
         <TaskList
+          timerStart={handleTimerStart}
+          timerStop={handleTimerStop}
           tasks={getFilteredTasks()}
           onTaskDestroy={handleTaskDestroy}
           onTaskStatusChange={handleTaskStatusChange}

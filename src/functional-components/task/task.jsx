@@ -2,7 +2,7 @@ import { formatDistance } from 'date-fns';
 import React, { useState } from 'react';
 import './task.css';
 
-const Task = ({ description, isCompleted, createDate, onDestroy, onStatusChange, onUpdate }) => {
+const Task = ({ description, isCompleted, createDate, onDestroy, onStatusChange, onUpdate, timer, start, stop }) => {
   const [isEditing, setIsEditing] = useState(false);
 
   const getClassName = () => {
@@ -29,13 +29,19 @@ const Task = ({ description, isCompleted, createDate, onDestroy, onStatusChange,
     const dateNow = new Date();
     return formatDistance(createDate, dateNow, { addSuffix: true });
   };
-
+  const minutes = Math.floor(timer / 1000 / 60);
+  const seconds = Math.floor(timer / 1000 - minutes * 60);
   return (
     <li className={getClassName()}>
       <div className="view">
         <input className="toggle" type="checkbox" checked={isCompleted} onChange={onStatusChange} />
         <label>
           <span className="description">{description}</span>
+          <span className="timer">
+            <button className="icon-play" onClick={start}></button>
+            <button className="icon-pause" onClick={stop}></button>
+            {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
+          </span>
           <span className="created">Created {getFormattedDate()}</span>
         </label>
         <button className="icon icon-edit" onClick={() => setIsEditing(true)}></button>
