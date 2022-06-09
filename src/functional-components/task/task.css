@@ -1,0 +1,34 @@
+.timer {
+  align-items: center;
+  font-size: 13px;
+  color: gray;
+}
+.icon-play {
+  margin-right: 5px;
+  color: #cc9a9a;
+  transition: color 0.2s ease-out;
+  cursor: pointer;
+}
+.icon-pause {
+  margin-right: 10px;
+  transition: color 0.2s ease-out;
+  cursor: pointer;
+}
+.icon-play:hover {
+  color: #af5b5e;
+}
+.icon-pause:hover {
+  color: #339eef;
+}
+.icon-pause,
+.icon-play {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+.icon-pause:after {
+  content: '⏸';
+}
+.icon-play:after {
+  content: '▶';
+}
